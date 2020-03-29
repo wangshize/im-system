@@ -9,12 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>im-gateway-tcp</artifactId>
+    <artifactId>im-core</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>com.github.im</groupId>
-            <artifactId>im-core</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -25,5 +25,4 @@
             <artifactId>fastjson</artifactId>
         </dependency>
     </dependencies>
-
 </project>

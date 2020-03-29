@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>im-gateway-tcp</artifactId>
+    <artifactId>im-sdk-android</artifactId>
 
     <dependencies>
         <dependency>
@@ -25,5 +25,4 @@
             <artifactId>fastjson</artifactId>
         </dependency>
     </dependencies>
-
 </project>

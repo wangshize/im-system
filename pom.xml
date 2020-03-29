@@ -11,14 +11,31 @@
     <modules>
         <module>im-gateway-tcp</module>
         <module>im-gateway-websocket</module>
+        <module>im-sdk-android</module>
+        <module>im-core</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.github.im</groupId>
+                <artifactId>im-core</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>4.1.38.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.8</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>1.2.61</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
