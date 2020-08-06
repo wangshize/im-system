@@ -13,6 +13,7 @@
         <module>im-gateway-websocket</module>
         <module>im-sdk-android</module>
         <module>im-core</module>
+        <module>im-dispacher</module>
     </modules>
 
     <dependencyManagement>

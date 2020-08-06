@@ -3,7 +3,6 @@ package com.github.im.tcp;
 import com.alibaba.fastjson.JSON;
 import com.github.im.core.RequestCommand;
 import com.github.im.core.UserRequest;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -29,8 +28,8 @@ public class GatewayTcpHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         SocketChannel channel = (SocketChannel) ctx.channel();
-        ChannelManager channelManager = ChannelManager.getInstance();
-        channelManager.removeChannel(channel);
+        ClientManager clientManager = ClientManager.getInstance();
+        clientManager.removeClient(channel);
         System.out.println("客户端连接断开，删除其连接缓存:" + channel.remoteAddress().toString());
     }
 
@@ -50,11 +49,14 @@ public class GatewayTcpHandler extends ChannelInboundHandlerAdapter {
 
             //认证成功的话，将这个连接缓存起来
             Channel channel = ctx.channel();
-            ChannelManager.getInstance().addChannel(userId, (SocketChannel) channel);
+            ClientManager clientManager = ClientManager.getInstance();
+            //维护本地会话lianjie
+            clientManager.addClient(userId, (SocketChannel) channel);
+            //有条件可以维护到redis里也一份
             System.out.println("对用户发起认证确认完毕，缓存客户端长链接：" + ctx.channel().remoteAddress().toString());
         } else {
             String userId = request.getUserId();
-            if (!ChannelManager.getInstance().exsiteChannel(userId)) {
+            if (!ClientManager.getInstance().existClient(userId)) {
                 byte[] responseBytes = "未认证用户#".getBytes();
                 ctx.writeAndFlush(Unpooled.wrappedBuffer(responseBytes));
             } else {

@@ -1,5 +1,6 @@
-package com.github.im.tcp;
+package com.github.im.tcp.push;
 
+import com.github.im.tcp.ClientManager;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.socket.SocketChannel;
 
@@ -25,8 +26,8 @@ public class PushManager {
 
                     String testUserId = "test002";
 
-                    ChannelManager channelManager = ChannelManager.getInstance();
-                    SocketChannel socketChannel = channelManager.getChannel(testUserId);
+                    ClientManager clientManager = ClientManager.getInstance();
+                    SocketChannel socketChannel = clientManager.getClient(testUserId);
                     if(socketChannel != null) {
                         String pushMsg = "test001向你推送一条消息#";
                         socketChannel.writeAndFlush(Unpooled.wrappedBuffer(pushMsg.getBytes()));

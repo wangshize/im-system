@@ -1,7 +1,5 @@
-package com.github.im.tcp;
+package com.github.im.dispatcher;
 
-import com.github.im.tcp.dispatcher.DispatcherInstanceManager;
-import com.github.im.tcp.push.PushManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -15,17 +13,13 @@ import io.netty.handler.codec.string.StringDecoder;
 
 /**
  * @author wangsz
- * @create 2020-03-24
+ * @create 2020-03-29
  **/
-public class GatewayTcpServer {
+public class DispatcherServer {
 
-    public static final int port = 8080;
+    public static final int port = 8090;
 
     public static void main(String[] args) throws Exception {
-        PushManager pushManager = new PushManager();
-        pushManager.start();
-        DispatcherInstanceManager dispatcherInstanceManager = DispatcherInstanceManager.getInstance();
-        dispatcherInstanceManager.init();
         EventLoopGroup connectionGroup = new NioEventLoopGroup();
         EventLoopGroup ioThreadGroup = new NioEventLoopGroup();
 
@@ -38,7 +32,7 @@ public class GatewayTcpServer {
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024, Unpooled.wrappedBuffer("#".getBytes())));
                             ch.pipeline().addLast(new StringDecoder());
-                            ch.pipeline().addLast(new GatewayTcpHandler());
+                            ch.pipeline().addLast(new DispatcherHandler());
                         }
                     });
             ChannelFuture channelFuture = server.bind(port).sync();
