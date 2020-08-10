@@ -19,7 +19,7 @@ public class ClientManager {
         return Singleton.instance;
     }
 
-    private ConcurrentHashMap<String, SocketChannel> uid2Client =
+    private ConcurrentHashMap<String, SocketChannel> clients =
             new ConcurrentHashMap<String, SocketChannel>();
 
     private ConcurrentHashMap<String, String> channelId2Uid =
@@ -28,22 +28,22 @@ public class ClientManager {
     public void addClient(String userId, SocketChannel channel) {
         String channelId = channel.id().asLongText();
         channelId2Uid.put(channelId, userId);
-        uid2Client.put(userId, channel);
+        clients.put(userId, channel);
     }
 
     public SocketChannel getClient(String userId) {
-        return uid2Client.get(userId);
+        return clients.get(userId);
     }
 
     public void removeClient(SocketChannel channel) {
         String channelId = channel.id().asLongText();
         String userId = channelId2Uid.get(channelId);
         channelId2Uid.remove(channelId);
-        uid2Client.remove(userId);
+        clients.remove(userId);
     }
 
     public boolean existClient(String userId) {
-        return uid2Client.containsKey(userId);
+        return clients.containsKey(userId);
     }
 
     private static class Singleton {

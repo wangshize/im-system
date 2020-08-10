@@ -12,6 +12,8 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 
 /**
+ * 请求分发系统
+ * 负责分发请求给底层其他各种业务系统进行业务处理
  * @author wangsz
  * @create 2020-03-29
  **/

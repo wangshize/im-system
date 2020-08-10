@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
+ * 请求分发系统管理
+ * 接入系统和分发系统双向持有对方的所有节点长链接
  * @author wangsz
  * @create 2020-03-29
  **/
@@ -22,10 +24,10 @@ public class DispatcherInstanceManager {
     private static List<DispatcherInstance> dispatcherInstances =
             new ArrayList<DispatcherInstance>();
 
-    private List<SocketChannel> dispatcherChannels = new CopyOnWriteArrayList<SocketChannel>();
+    private List<SocketChannel> dispatchers = new CopyOnWriteArrayList<SocketChannel>();
 
     static {
-        //获取Dispatcher实例信息
+        //获取Dispatcher分发系统的实例信息
         dispatcherInstances.add(new DispatcherInstance("localhost", "127.0.0.1", 8090));
     }
 
@@ -34,10 +36,15 @@ public class DispatcherInstanceManager {
     }
 
     public void init() {
+        //接入系统和分发系统建立长链接
         for (DispatcherInstance dispatcherInstance : dispatcherInstances) {
             connectDispatcher(dispatcherInstance);
         }
 
+    }
+
+    public List<SocketChannel> getDispatchers() {
+        return dispatchers;
     }
 
     private void connectDispatcher(DispatcherInstance dispatcherInstance) {
@@ -62,7 +69,7 @@ public class DispatcherInstanceManager {
             public void operationComplete(ChannelFuture future) throws Exception {
                 if(future.isSuccess()) {
                     SocketChannel channel = (SocketChannel) future.channel();
-                    dispatcherChannels.add(channel);
+                    dispatchers.add(channel);
                     System.out.println("分发系统建立连接成功");
                 } else {
                     future.channel().close();

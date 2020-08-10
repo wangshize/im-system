@@ -22,7 +22,7 @@ public class PushManager {
         public void run() {
             while (true) {
                 try {
-                    Thread.sleep(30 * 1000);
+                    Thread.sleep(10 * 1000);
 
                     String testUserId = "test002";
 

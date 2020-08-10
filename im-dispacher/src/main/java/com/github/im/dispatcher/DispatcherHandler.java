@@ -2,6 +2,8 @@ package com.github.im.dispatcher;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.socket.SocketChannel;
+
 
 /**
  * @author wangsz
@@ -17,15 +19,18 @@ public class DispatcherHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         GatewayManager gatewayManager = GatewayManager.getInstance();
-        super.channelActive(ctx);
+        SocketChannel channel = (SocketChannel)ctx.channel();
+        gatewayManager.addGatewayInstance(channel.id().asLongText(), channel);
     }
 
     /**
-     * 端口连接
+     * 断开连接
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        super.channelInactive(ctx);
+        GatewayManager gatewayManager = GatewayManager.getInstance();
+        SocketChannel channel = (SocketChannel)ctx.channel();
+        gatewayManager.removeGatewayInstance(channel.id().asLongText());
     }
 
     @Override

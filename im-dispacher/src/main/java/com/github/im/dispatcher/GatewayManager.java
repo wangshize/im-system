@@ -1,6 +1,7 @@
 package com.github.im.dispatcher;
 
-import java.nio.channels.SocketChannel;
+import io.netty.channel.socket.SocketChannel;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -24,8 +25,12 @@ public class GatewayManager {
      * @param channelId
      * @param channel
      */
-    public void addInstance(String channelId, SocketChannel channel) {
+    public void addGatewayInstance(String channelId, SocketChannel channel) {
         gateWayInstances.put(channelId, channel);
+    }
+
+    public void removeGatewayInstance(String channelId) {
+        gateWayInstances.remove(channelId);
     }
 
     private static class Singleton {
