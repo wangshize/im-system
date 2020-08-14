@@ -7,13 +7,13 @@ import lombok.Data;
  * @create 2020-03-29
  **/
 @Data
-public class DispatcherInstance {
+public class DispatcherAddress {
 
     private String hostName;
     private String ip;
     private int port;
 
-    public DispatcherInstance(String hostName, String ip, int port) {
+    public DispatcherAddress(String hostName, String ip, int port) {
         this.hostName = hostName;
         this.ip = ip;
         this.port = port;

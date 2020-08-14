@@ -1,5 +1,6 @@
 package com.github.im.tcp;
 
+import com.github.im.core.ImConstants;
 import com.github.im.tcp.dispatcher.DispatcherInstanceManager;
 import com.github.im.tcp.push.PushManager;
 import io.netty.bootstrap.ServerBootstrap;
@@ -11,6 +12,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 
 /**
@@ -36,8 +38,11 @@ public class GatewayTcpServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024, Unpooled.wrappedBuffer("#".getBytes())));
-                            ch.pipeline().addLast(new StringDecoder());
+                            ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(ImConstants.MAX_FRAME_LENGTH,
+                                    /**消息总长度开始的下标*/0,
+                                    /**消息总长度的值的长度，如长度域（head+body）是1000，其长度就是int 4字节*/4,
+                                    /**数据包长度 - lengthFieldOffset - lengthFieldLength - 长度域的值（head+body）*/0,
+                                    /**接收到的发送数据包，去除前initialBytesToStrip位*/4));
                             ch.pipeline().addLast(new GatewayTcpHandler());
                         }
                     });

@@ -10,43 +10,43 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author wangsz
  * @create 2020-03-28
  **/
-public class ClientManager {
+public class SessionManager {
 
-    private ClientManager() {
+    private SessionManager() {
     }
 
-    public static ClientManager getInstance() {
+    public static SessionManager getInstance() {
         return Singleton.instance;
     }
 
-    private ConcurrentHashMap<String, SocketChannel> clients =
+    private ConcurrentHashMap<String, SocketChannel> sessions =
             new ConcurrentHashMap<String, SocketChannel>();
 
     private ConcurrentHashMap<String, String> channelId2Uid =
             new ConcurrentHashMap<String, String>();
 
-    public void addClient(String userId, SocketChannel channel) {
+    public void addSession(String userId, SocketChannel channel) {
         String channelId = channel.id().asLongText();
         channelId2Uid.put(channelId, userId);
-        clients.put(userId, channel);
+        sessions.put(userId, channel);
     }
 
-    public SocketChannel getClient(String userId) {
-        return clients.get(userId);
+    public SocketChannel getSession(String userId) {
+        return sessions.get(userId);
     }
 
-    public void removeClient(SocketChannel channel) {
+    public void removeSession(SocketChannel channel) {
         String channelId = channel.id().asLongText();
         String userId = channelId2Uid.get(channelId);
         channelId2Uid.remove(channelId);
-        clients.remove(userId);
+        sessions.remove(userId);
     }
 
-    public boolean existClient(String userId) {
-        return clients.containsKey(userId);
+    public boolean existSession(String userId) {
+        return sessions.containsKey(userId);
     }
 
     private static class Singleton {
-        public static ClientManager instance = new ClientManager();
+        public static SessionManager instance = new SessionManager();
     }
 }

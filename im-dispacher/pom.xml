@@ -17,6 +17,10 @@
             <artifactId>im-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.github.im</groupId>
+            <artifactId>im-proto</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
         </dependency>

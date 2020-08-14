@@ -1,5 +1,6 @@
 package com.github.im.test;
 
+import com.github.im.protocol.AuthenticateRequest;
 import com.github.im.sdk.ImClient;
 
 /**
@@ -13,7 +14,7 @@ public class Test {
         client.connect("127.0.0.1", 8080);
         String userId= "test001";
         client.authenticate(userId, "test_token");
-        client.send(userId, userId + " 测试消息");
+//        client.send(userId, userId + " 测试消息");
 
         while (true) {
             Thread.sleep(1000);

@@ -1,17 +1,17 @@
 package com.github.im.sdk;
 
+import com.github.im.core.ImConstants;
+import com.github.im.core.ProtocolByteBufBuilder;
 import com.github.im.core.RequestCommand;
 import com.github.im.core.UserRequest;
+import com.github.im.protocol.AuthenticateRequest;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.FixedLengthFrameDecoder;
-import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
 /**
  * @author wangsz
@@ -47,8 +47,8 @@ public class ImClient {
 
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024, Unpooled.wrappedBuffer("#".getBytes())));
-                        ch.pipeline().addLast(new StringDecoder());
+                        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(ImConstants.MAX_FRAME_LENGTH,
+                                0, 4, 0, 4));
                         ch.pipeline().addLast(new ImClientHandler());
                     }
                 });
@@ -70,14 +70,16 @@ public class ImClient {
     /**
      * 用户认证
      */
-    public void authenticate(String userId, String token) {
-        UserRequest request = new UserRequest();
-        request.setCommand(RequestCommand.AUTHENTICATE);
-        request.setUserId(userId);
-        request.setToken(token);
-        ByteBuf byteBuf = request.toByteBuf();
-        channel.writeAndFlush(byteBuf);
+    public void authenticate(String uid, String token) throws InterruptedException {
+        AuthenticateRequest request = AuthenticateRequest.newBuilder()
+                .setUid(uid)
+                .setToken(token)
+                .setTimestamp(System.currentTimeMillis())
+                .build();
+        byte[] body = request.toByteArray();
+        ByteBuf requestBuffer = ProtocolByteBufBuilder.buildByteBuf(body, RequestCommand.AUTHENTICATE);
         System.out.println("向TCP接入系统发起用户认证");
+        ChannelFuture future = channel.writeAndFlush(requestBuffer);
     }
 
     /**
@@ -87,8 +89,6 @@ public class ImClient {
     public void send(String userId, String message) {
         UserRequest request = new UserRequest();
         request.setUserId(userId);
-        request.setMessage(message);
-        request.setCommand(RequestCommand.MESSAGE);
         this.channel.writeAndFlush(request.toByteBuf());
         System.out.println("向TCP接入系统发起消息，推送给test002");
     }

@@ -1,5 +1,6 @@
 package com.github.im.tcp.dispatcher;
 
+import com.github.im.core.ImConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
@@ -7,10 +8,12 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -21,14 +24,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
  **/
 public class DispatcherInstanceManager {
 
-    private static List<DispatcherInstance> dispatcherInstances =
-            new ArrayList<DispatcherInstance>();
+    private static List<DispatcherAddress> dispatcherInstances =
+            new ArrayList<DispatcherAddress>();
 
-    private List<SocketChannel> dispatchers = new CopyOnWriteArrayList<SocketChannel>();
+    private List<DispatcherPeer> dispatchers = new CopyOnWriteArrayList<DispatcherPeer>();
 
     static {
         //获取Dispatcher分发系统的实例信息
-        dispatcherInstances.add(new DispatcherInstance("localhost", "127.0.0.1", 8090));
+        dispatcherInstances.add(new DispatcherAddress("localhost", "127.0.0.1", 8090));
     }
 
     public static DispatcherInstanceManager getInstance() {
@@ -37,17 +40,23 @@ public class DispatcherInstanceManager {
 
     public void init() {
         //接入系统和分发系统建立长链接
-        for (DispatcherInstance dispatcherInstance : dispatcherInstances) {
+        for (DispatcherAddress dispatcherInstance : dispatcherInstances) {
             connectDispatcher(dispatcherInstance);
         }
 
     }
 
-    public List<SocketChannel> getDispatchers() {
+    public List<DispatcherPeer> getDispatchers() {
         return dispatchers;
     }
 
-    private void connectDispatcher(DispatcherInstance dispatcherInstance) {
+    public DispatcherPeer selectOne() {
+        Random random = new Random();
+        int index = random.nextInt(dispatchers.size());
+        return dispatchers.get(index);
+    }
+
+    private void connectDispatcher(DispatcherAddress dispatcherInstance) {
         final EventLoopGroup threadGroup = new NioEventLoopGroup();
         Bootstrap client = new Bootstrap();
         client.group(threadGroup)
@@ -58,8 +67,8 @@ public class DispatcherInstanceManager {
 
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024, Unpooled.wrappedBuffer("#".getBytes())));
-                        ch.pipeline().addLast(new StringDecoder());
+                        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(ImConstants.MAX_FRAME_LENGTH,
+                                0,4,0,4));
                         ch.pipeline().addLast(new DispatcherClientHandler());
                     }
                 });
@@ -69,7 +78,7 @@ public class DispatcherInstanceManager {
             public void operationComplete(ChannelFuture future) throws Exception {
                 if(future.isSuccess()) {
                     SocketChannel channel = (SocketChannel) future.channel();
-                    dispatchers.add(channel);
+                    dispatchers.add(new DispatcherPeer(channel));
                     System.out.println("分发系统建立连接成功");
                 } else {
                     future.channel().close();
